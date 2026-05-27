@@ -3,156 +3,654 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Anh Nhớ Em ❤️</title>
+
+  <title>Educational Algorithm Visualizer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- FRAMER MOTION -->
+  <script src="https://unpkg.com/framer-motion/dist/framer-motion.js"></script>
 
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family: Arial, sans-serif;
-    }
-
     body{
-      overflow:hidden;
-      background: linear-gradient(135deg,#ff5f9e,#ff89c0,#ffc2de);
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      position:relative;
-    }
-
-    .main-btn{
-      padding:18px 40px;
-      font-size:24px;
-      border:none;
-      border-radius:20px;
-      background:white;
-      color:#ff2d75;
-      font-weight:bold;
-      cursor:pointer;
-      box-shadow:0 0 20px rgba(255,255,255,0.7);
-      transition:0.3s;
-      z-index:9999;
-    }
-
-    .main-btn:hover{
-      transform:scale(1.08);
-    }
-
-    .popup{
-      position:absolute;
-      width:220px;
-      height:120px;
-      background:white;
-      border-radius:20px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      font-size:28px;
-      font-weight:bold;
-      color:#ff2d75;
-      box-shadow:0 0 20px rgba(0,0,0,0.25);
-      animation:showUp 0.4s ease;
-      user-select:none;
-    }
-
-    @keyframes showUp{
-      0%{
-        transform:scale(0);
-        opacity:0;
-      }
-      100%{
-        transform:scale(1);
-        opacity:1;
-      }
-    }
-
-    .heart{
-      position:absolute;
+      background:#020617;
       color:white;
-      font-size:20px;
-      animation:fall linear infinite;
-      opacity:0.8;
+      overflow:hidden;
+      font-family:Inter,sans-serif;
     }
 
-    @keyframes fall{
-      from{
-        transform:translateY(-100px);
-      }
-      to{
-        transform:translateY(110vh);
-      }
+    .glass{
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
+      backdrop-filter:blur(14px);
+    }
+
+    ::-webkit-scrollbar{
+      width:6px;
+    }
+
+    ::-webkit-scrollbar-thumb{
+      background:#334155;
+      border-radius:999px;
     }
   </style>
 </head>
+
 <body>
 
-<button class="main-btn" onclick="startLove()">
-  Bấm Vào Đây ❤️
-</button>
+<div id="root"></div>
 
-<script>
-  let started = false;
+<script type="text/babel">
 
-  function startLove(){
-    if(started) return;
-    started = true;
+const { useState, useEffect, useRef } = React;
+const { motion, AnimatePresence } = Motion;
 
-    const btn = document.querySelector(".main-btn");
-    btn.style.display = "none";
+function App(){
 
-    // Tạo popup liên tục
-    let count = 0;
+  // =========================
+  // STATES
+  // =========================
 
-    const interval = setInterval(() => {
+  const [array,setArray] = useState([42,18,75,11,67,29,90,5]);
+  const [steps,setSteps] = useState([]);
 
-      const box = document.createElement("div");
-      box.className = "popup";
-      box.innerText = "ANH NHỚ EM ❤️";
+  const [currentStep,setCurrentStep] = useState(0);
 
-      // random vị trí
-      const x = Math.random() * (window.innerWidth - 220);
-      const y = Math.random() * (window.innerHeight - 120);
+  const [playing,setPlaying] = useState(false);
 
-      box.style.left = x + "px";
-      box.style.top = y + "px";
+  const [speed,setSpeed] = useState(700);
 
-      // random xoay nhẹ
-      const rotate = (Math.random() * 20) - 10;
-      box.style.transform = `rotate(${rotate}deg)`;
+  const [stats,setStats] = useState({
+    comparisons:0,
+    swaps:0,
+    sorted:0
+  });
 
-      document.body.appendChild(box);
+  const audioCtxRef = useRef(null);
 
-      count++;
+  // =========================
+  // AUDIO
+  // =========================
 
-      // chàn ngập màn hình
-      if(count > 120){
-        clearInterval(interval);
+  useEffect(()=>{
+    audioCtxRef.current =
+      new (window.AudioContext || window.webkitAudioContext)();
+  },[]);
+
+  const playClick = (freq=180,duration=0.03,volume=0.03) => {
+
+    const ctx = audioCtxRef.current;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.frequency.value = freq;
+    gain.gain.value = volume;
+
+    osc.start();
+
+    osc.stop(ctx.currentTime + duration);
+  };
+
+  // =========================
+  // TEXT TO SPEECH
+  // =========================
+
+  const speak = (text) => {
+
+    speechSynthesis.cancel();
+
+    const utterance =
+      new SpeechSynthesisUtterance(text);
+
+    utterance.lang = "vi-VN";
+    utterance.rate = 1;
+
+    speechSynthesis.speak(utterance);
+  };
+
+  // =========================
+  // PSEUDO CODE
+  // =========================
+
+  const codeLines = [
+    "for(i = 0; i < n - 1; i++)",
+    "   min = i",
+    "   for(j = i + 1; j < n; j++)",
+    "      if(arr[j] < arr[min])",
+    "         min = j",
+    "   if(min != i)",
+    "      swap(arr[i], arr[min])",
+    "mark sorted"
+  ];
+
+  // =========================
+  // STEP GENERATOR
+  // =========================
+
+  const generateSelectionSort = () => {
+
+    const arr = [...array];
+
+    const generated = [];
+
+    let comparisons = 0;
+    let swaps = 0;
+
+    for(let i=0;i<arr.length-1;i++){
+
+      let min = i;
+
+      generated.push({
+        type:"select",
+        line:1,
+        i,
+        min,
+        array:[...arr],
+        message:`Chọn vị trí nhỏ nhất bắt đầu từ index ${i}`
+      });
+
+      for(let j=i+1;j<arr.length;j++){
+
+        comparisons++;
+
+        generated.push({
+          type:"compare",
+          line:3,
+          i,
+          j,
+          min,
+          array:[...arr],
+          comparisons,
+          swaps,
+          message:`So sánh arr[${j}] với arr[${min}]`
+        });
+
+        if(arr[j] < arr[min]){
+
+          min = j;
+
+          generated.push({
+            type:"newMin",
+            line:4,
+            i,
+            j,
+            min,
+            array:[...arr],
+            comparisons,
+            swaps,
+            message:`Tìm thấy giá trị nhỏ hơn mới`
+          });
+        }
       }
 
-    }, 120);
+      if(min !== i){
 
-    // tạo tim rơi
-    setInterval(createHeart, 120);
-  }
+        [arr[i],arr[min]] =
+        [arr[min],arr[i]];
 
-  function createHeart(){
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerHTML = "❤️";
+        swaps++;
 
-    heart.style.left = Math.random() * window.innerWidth + "px";
-    heart.style.fontSize = (Math.random() * 25 + 15) + "px";
-    heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        generated.push({
+          type:"swap",
+          line:6,
+          i,
+          min,
+          array:[...arr],
+          comparisons,
+          swaps,
+          message:`Hoán đổi phần tử tại ${i} và ${min}`
+        });
+      }
 
-    document.body.appendChild(heart);
+      generated.push({
+        type:"sorted",
+        line:7,
+        i,
+        min,
+        array:[...arr],
+        comparisons,
+        swaps,
+        sorted:i+1,
+        message:`Phần tử tại index ${i} đã đúng vị trí`
+      });
+    }
 
-    setTimeout(() => {
-      heart.remove();
-    }, 5000);
-  }
+    generated.push({
+      type:"done",
+      line:7,
+      array:[...arr],
+      comparisons,
+      swaps,
+      sorted:arr.length,
+      message:"Thuật toán hoàn tất"
+    });
+
+    setSteps(generated);
+    setCurrentStep(0);
+  };
+
+  // =========================
+  // INITIAL
+  // =========================
+
+  useEffect(()=>{
+    generateSelectionSort();
+  },[]);
+
+  // =========================
+  // PLAY ENGINE
+  // =========================
+
+  useEffect(()=>{
+
+    if(!playing) return;
+
+    if(currentStep >= steps.length-1){
+      setPlaying(false);
+      return;
+    }
+
+    const timeout = setTimeout(()=>{
+
+      const next = currentStep + 1;
+
+      const step = steps[next];
+
+      // sound
+      if(step.type === "swap"){
+        playClick(120,0.05,0.04);
+      }else{
+        playClick(220,0.02,0.02);
+      }
+
+      // speech
+      speak(step.message);
+
+      // statistics
+      setStats({
+        comparisons:step.comparisons || 0,
+        swaps:step.swaps || 0,
+        sorted:step.sorted || 0
+      });
+
+      setCurrentStep(next);
+
+    },speed);
+
+    return ()=>clearTimeout(timeout);
+
+  },[playing,currentStep,steps,speed]);
+
+  const step = steps[currentStep] || {};
+
+  // =========================
+  // COLORS
+  // =========================
+
+  const getBarColor = (index) => {
+
+    if(step.type === "done")
+      return "#22c55e";
+
+    if(index < (step.sorted || 0))
+      return "#22c55e";
+
+    if(index === step.i || index === step.j)
+      return "#0ea5e9";
+
+    if(index === step.min)
+      return "#f59e0b";
+
+    if(step.type === "swap" &&
+      (index === step.i || index === step.min))
+      return "#ef4444";
+
+    return "#334155";
+  };
+
+  // =========================
+  // UI
+  // =========================
+
+  return (
+
+    <div className="h-screen p-5 flex flex-col gap-5">
+
+      {/* HEADER */}
+
+      <div className="glass rounded-3xl p-5 flex justify-between items-center">
+
+        <div>
+          <h1 className="text-3xl font-black text-sky-400">
+            Educational Algorithm Visualizer
+          </h1>
+
+          <p className="text-slate-400 text-sm mt-1">
+            Selection Sort + Framer Motion + Code Tracing
+          </p>
+        </div>
+
+        <div className="text-sm text-slate-500 font-mono">
+          Educational UX Engineering
+        </div>
+      </div>
+
+      {/* MAIN */}
+
+      <div className="grid grid-cols-12 gap-5 flex-1 overflow-hidden">
+
+        {/* VISUALIZER */}
+
+        <div className="col-span-8 glass rounded-3xl p-6 flex flex-col">
+
+          {/* DASHBOARD */}
+
+          <div className="grid grid-cols-3 gap-4 mb-8">
+
+            <DashboardCard
+              title="Comparisons"
+              value={stats.comparisons}
+              color="text-sky-400"
+            />
+
+            <DashboardCard
+              title="Swaps"
+              value={stats.swaps}
+              color="text-rose-400"
+            />
+
+            <DashboardCard
+              title="Sorted"
+              value={stats.sorted}
+              color="text-emerald-400"
+            />
+          </div>
+
+          {/* BARS */}
+
+          <div className="flex-1 flex items-end justify-center gap-4">
+
+            <AnimatePresence>
+
+              {step.array?.map((value,index)=>(
+
+                <motion.div
+                  layout
+                  key={index + "-" + value}
+
+                  transition={{
+                    type:"spring",
+                    stiffness:220,
+                    damping:18
+                  }}
+
+                  animate={{
+                    height:value * 3,
+                    backgroundColor:getBarColor(index)
+                  }}
+
+                  className="
+                    w-16 rounded-t-2xl
+                    flex items-start justify-center
+                    pt-2 font-bold text-white
+                    shadow-lg
+                  "
+                >
+                  {value}
+                </motion.div>
+
+              ))}
+
+            </AnimatePresence>
+
+          </div>
+
+          {/* CONTROLS */}
+
+          <div className="mt-8 flex items-center gap-4">
+
+            <button
+              onClick={()=>setPlaying(!playing)}
+              className="
+                bg-sky-500 hover:bg-sky-400
+                px-5 py-3 rounded-xl
+                font-bold
+              "
+            >
+              {playing ? "Pause" : "Play"}
+            </button>
+
+            <button
+              onClick={()=>{
+                setPlaying(false);
+                setCurrentStep(prev =>
+                  Math.max(prev - 1,0)
+                );
+              }}
+              className="
+                bg-white/5
+                border border-white/10
+                px-4 py-3 rounded-xl
+              "
+            >
+              Prev
+            </button>
+
+            <button
+              onClick={()=>{
+                setPlaying(false);
+                setCurrentStep(prev =>
+                  Math.min(prev + 1,steps.length-1)
+                );
+              }}
+              className="
+                bg-white/5
+                border border-white/10
+                px-4 py-3 rounded-xl
+              "
+            >
+              Next
+            </button>
+
+            {/* SPEED */}
+
+            <div className="ml-auto flex items-center gap-3">
+
+              <span className="text-slate-400 text-sm">
+                🐢
+              </span>
+
+              <input
+                type="range"
+                min="100"
+                max="1500"
+                step="50"
+                value={speed}
+                onChange={(e)=>
+                  setSpeed(Number(e.target.value))
+                }
+                className="w-48 accent-sky-500"
+              />
+
+              <span className="text-slate-400 text-sm">
+                ⚡
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* CODE TRACING */}
+
+        <div className="col-span-4 glass rounded-3xl p-6 flex flex-col">
+
+          <div className="mb-5">
+
+            <h2 className="text-xl font-black text-emerald-400">
+              Code Tracing
+            </h2>
+
+            <p className="text-slate-500 text-sm mt-1">
+              Highlight realtime theo bước thuật toán
+            </p>
+          </div>
+
+          {/* CODE */}
+
+          <div className="space-y-2 font-mono text-sm">
+
+            {codeLines.map((line,index)=>{
+
+              const active =
+                step.line === index;
+
+              return (
+
+                <motion.div
+                  key={index}
+
+                  animate={{
+                    backgroundColor:
+                      active
+                        ? "rgba(14,165,233,0.15)"
+                        : "rgba(255,255,255,0)",
+
+                    borderColor:
+                      active
+                        ? "rgba(14,165,233,0.5)"
+                        : "rgba(255,255,255,0)"
+                  }}
+
+                  className="
+                    px-4 py-3 rounded-xl
+                    border
+                  "
+                >
+
+                  <div className="flex items-center gap-3">
+
+                    <div className={`
+                      text-xs
+                      ${active
+                        ? "text-sky-400"
+                        : "text-slate-600"}
+                    `}>
+                      {active ? "▶" : index + 1}
+                    </div>
+
+                    <div className={`
+                      ${active
+                        ? "text-sky-200"
+                        : "text-slate-400"}
+                    `}>
+                      {line}
+                    </div>
+
+                  </div>
+
+                </motion.div>
+
+              );
+            })}
+
+          </div>
+
+          {/* EXPLANATION */}
+
+          <div className="
+            mt-auto
+            pt-5
+            border-t border-white/5
+          ">
+
+            <div className="text-slate-500 text-xs uppercase mb-2">
+              Current Explanation
+            </div>
+
+            <motion.div
+              key={step.message}
+              initial={{opacity:0,y:10}}
+              animate={{opacity:1,y:0}}
+
+              className="
+                text-slate-300
+                leading-relaxed
+              "
+            >
+              {step.message}
+            </motion.div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+function DashboardCard({title,value,color}){
+
+  return (
+
+    <div className="
+      glass rounded-2xl p-5
+    ">
+
+      <div className="
+        text-slate-500 text-xs uppercase
+        tracking-wider
+      ">
+        {title}
+      </div>
+
+      <motion.div
+        key={value}
+
+        initial={{
+          scale:1.3,
+          opacity:0.5
+        }}
+
+        animate={{
+          scale:1,
+          opacity:1
+        }}
+
+        transition={{
+          type:"spring"
+        }}
+
+        className={`
+          text-4xl font-black mt-2
+          ${color}
+        `}
+      >
+        {value}
+      </motion.div>
+
+    </div>
+  );
+}
+
+const root =
+  ReactDOM.createRoot(
+    document.getElementById("root")
+  );
+
+root.render(<App />);
+
 </script>
 
 </body>
