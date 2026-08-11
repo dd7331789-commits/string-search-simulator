@@ -1,655 +1,2326 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Educational Algorithm Visualizer</title>
+<title>FoodHub - Ẩm thực Việt Nam</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+<style>
 
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+/* =====================================================
+   RESET
+===================================================== */
 
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-  <!-- FRAMER MOTION -->
-  <script src="https://unpkg.com/framer-motion/dist/framer-motion.js"></script>
+html {
+    scroll-behavior: smooth;
+}
 
-  <style>
-    body{
-      background:#020617;
-      color:white;
-      overflow:hidden;
-      font-family:Inter,sans-serif;
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f4f5;
+    color: #18181b;
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header {
+    height: 75px;
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid #e4e4e7;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 6%;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 1000;
+}
+
+.logo {
+    text-decoration: none;
+    color: #18181b;
+
+    font-size: 27px;
+    font-weight: 900;
+}
+
+.logo span {
+    color: #f97316;
+}
+
+.nav {
+    display: flex;
+    gap: 5px;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #52525b;
+
+    font-weight: 700;
+
+    padding: 9px 14px;
+
+    border-radius: 9px;
+
+    transition: .2s;
+}
+
+.nav a:hover,
+.nav a.active {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+
+/* =====================================================
+   PAGE SYSTEM
+===================================================== */
+
+.page {
+    display: none;
+
+    min-height: 100vh;
+
+    padding-top: 75px;
+
+    animation: pageIn .45s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageIn {
+
+    from {
+        opacity: 0;
+        transform: translateX(30px);
     }
 
-    .glass{
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.06);
-      backdrop-filter:blur(14px);
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 
-    ::-webkit-scrollbar{
-      width:6px;
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero {
+    min-height: calc(100vh - 75px);
+
+    display: flex;
+    align-items: center;
+
+    padding: 70px 8%;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,.82),
+            rgba(0,0,0,.3)
+        ),
+
+        url(
+            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1800&q=90"
+        )
+
+        center / cover;
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.badge {
+    display: inline-block;
+
+    background: #fff7ed;
+    color: #ea580c;
+
+    padding: 7px 14px;
+
+    border-radius: 50px;
+
+    font-weight: 800;
+
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: clamp(50px, 8vw, 90px);
+
+    line-height: .95;
+
+    letter-spacing: -4px;
+
+    margin-bottom: 25px;
+}
+
+.hero h1 span {
+    color: #fb923c;
+}
+
+.hero p {
+    max-width: 600px;
+
+    font-size: 19px;
+
+    color: #e4e4e7;
+
+    margin-bottom: 30px;
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-block;
+
+    text-decoration: none;
+
+    border: none;
+
+    cursor: pointer;
+
+    padding: 13px 20px;
+
+    border-radius: 11px;
+
+    font-weight: 800;
+
+    transition: .2s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+}
+
+.primary {
+    background: #f97316;
+    color: white;
+}
+
+.primary:hover {
+    background: #ea580c;
+}
+
+.secondary {
+    background: white;
+    color: #18181b;
+
+    border: 1px solid #e4e4e7;
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.container {
+    max-width: 1200px;
+
+    margin: auto;
+
+    padding: 55px 30px 80px;
+}
+
+.section-title {
+    text-align: center;
+
+    margin-bottom: 45px;
+}
+
+.section-title small {
+    color: #f97316;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+}
+
+.section-title h1,
+.section-title h2 {
+    font-size: clamp(35px,5vw,55px);
+
+    line-height: 1.1;
+
+    margin: 8px 0;
+}
+
+.section-title p {
+    color: #71717a;
+}
+
+
+/* =====================================================
+   FEATURE
+===================================================== */
+
+.feature-grid {
+    max-width: 1100px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(3,1fr);
+
+    gap: 25px;
+}
+
+.feature-card {
+    text-decoration: none;
+
+    color: inherit;
+
+    background: white;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 20px;
+
+    padding: 35px;
+
+    transition: .25s;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.1);
+}
+
+.feature-icon {
+    font-size: 45px;
+
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    font-size: 23px;
+}
+
+.feature-card p {
+    color: #71717a;
+}
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+.back {
+    display: inline-block;
+
+    color: #52525b;
+
+    text-decoration: none;
+
+    font-weight: 800;
+
+    margin-bottom: 30px;
+}
+
+.back:hover {
+    color: #f97316;
+}
+
+
+/* =====================================================
+   CATEGORY
+===================================================== */
+
+.category {
+    display: flex;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-bottom: 35px;
+}
+
+.category button {
+    border: 1px solid #e4e4e7;
+
+    background: white;
+
+    padding: 10px 18px;
+
+    border-radius: 50px;
+
+    cursor: pointer;
+
+    font-weight: 700;
+
+    transition: .2s;
+}
+
+.category button:hover,
+.category button.active {
+    background: #f97316;
+
+    color: white;
+}
+
+
+/* =====================================================
+   FOOD GRID
+===================================================== */
+
+.food-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 25px;
+}
+
+.food-card {
+    background: white;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    transition: .25s;
+}
+
+.food-card:hover {
+    transform: translateY(-6px);
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,.1);
+}
+
+.food-card img {
+    width: 100%;
+
+    height: 220px;
+
+    object-fit: cover;
+}
+
+.food-info {
+    padding: 20px;
+}
+
+.food-info h3 {
+    font-size: 21px;
+}
+
+.food-info p {
+    color: #71717a;
+
+    font-size: 14px;
+
+    margin: 7px 0 15px;
+}
+
+.food-bottom {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.food-bottom strong {
+    color: #f97316;
+
+    font-size: 18px;
+}
+
+.small-btn {
+    text-decoration: none;
+
+    background: #18181b;
+
+    color: white;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   RESTAURANT
+===================================================== */
+
+.restaurant-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 25px;
+}
+
+.restaurant-card {
+    background: white;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+.restaurant-card img {
+    width: 100%;
+
+    height: 270px;
+
+    object-fit: cover;
+}
+
+.restaurant-info {
+    padding: 25px;
+}
+
+.restaurant-info p {
+    color: #71717a;
+
+    margin: 5px 0;
+}
+
+.restaurant-info .btn {
+    margin-top: 15px;
+}
+
+
+/* =====================================================
+   DETAIL
+===================================================== */
+
+.detail-layout {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 50px;
+
+    align-items: center;
+}
+
+.detail-image {
+    width: 100%;
+
+    height: 600px;
+
+    object-fit: cover;
+
+    border-radius: 25px;
+}
+
+.detail-info h1 {
+    font-size: clamp(40px,5vw,65px);
+
+    line-height: 1;
+
+    margin: 20px 0;
+}
+
+.detail-description {
+    color: #71717a;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+}
+
+.detail-price {
+    color: #f97316;
+
+    font-size: 32px;
+
+    margin: 25px 0;
+}
+
+.back-links {
+    display: flex;
+
+    gap: 20px;
+
+    margin-top: 30px;
+}
+
+.back-links a {
+    color: #52525b;
+
+    text-decoration: none;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   BOOKING
+===================================================== */
+
+.booking-box {
+    max-width: 650px;
+
+    margin: auto;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 20px;
+
+    border: 1px solid #e4e4e7;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.06);
+}
+
+.booking-box label {
+    display: block;
+
+    font-weight: 800;
+
+    margin: 15px 0 7px;
+}
+
+.booking-box input,
+.booking-box select,
+.booking-box textarea {
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #d4d4d8;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+}
+
+.booking-box textarea {
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+.booking-box button {
+    margin-top: 25px;
+
+    width: 100%;
+}
+
+
+/* =====================================================
+   CART
+===================================================== */
+
+.cart-box {
+    max-width: 800px;
+
+    margin: auto;
+
+    background: white;
+
+    border: 1px solid #e4e4e7;
+
+    border-radius: 20px;
+
+    padding: 25px;
+}
+
+.cart-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 15px 0;
+
+    border-bottom:
+        1px solid #e4e4e7;
+}
+
+.cart-item img {
+    width: 100px;
+
+    height: 80px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+}
+
+.cart-item div {
+    flex: 1;
+}
+
+.cart-item p {
+    color: #71717a;
+}
+
+.cart-total {
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    font-size: 23px;
+
+    padding: 25px 0;
+}
+
+.cart-total strong {
+    color: #f97316;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+    text-align: center;
+
+    background: #18181b;
+
+    color: white;
+
+    padding: 40px;
+}
+
+footer a {
+    color: #fb923c;
+
+    text-decoration: none;
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+.toast {
+    position: fixed;
+
+    right: 25px;
+
+    bottom: 25px;
+
+    background: #18181b;
+
+    color: white;
+
+    padding: 15px 22px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.2);
+
+    opacity: 0;
+
+    transform:
+        translateY(30px);
+
+    pointer-events: none;
+
+    transition: .3s;
+
+    z-index: 5000;
+}
+
+.toast.show {
+    opacity: 1;
+
+    transform:
+        translateY(0);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:850px) {
+
+    .nav a {
+        padding: 7px;
+
+        font-size: 13px;
     }
 
-    ::-webkit-scrollbar-thumb{
-      background:#334155;
-      border-radius:999px;
+    .feature-grid,
+    .food-grid {
+        grid-template-columns:
+            repeat(2,1fr);
     }
-  </style>
+
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-image {
+        height: 400px;
+    }
+
+}
+
+@media(max-width:600px) {
+
+    .header {
+        height: auto;
+
+        padding: 12px 15px;
+
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+    .nav {
+        width: 100%;
+
+        overflow-x: auto;
+    }
+
+    .nav a {
+        white-space: nowrap;
+    }
+
+    .page {
+        padding-top: 105px;
+    }
+
+    .hero {
+        padding: 50px 25px;
+    }
+
+    .hero h1 {
+        font-size: 50px;
+    }
+
+    .feature-grid,
+    .food-grid,
+    .restaurant-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding:
+            35px 18px 60px;
+    }
+
+    .booking-box {
+        padding:
+            25px 20px;
+    }
+
+}
+
+</style>
 </head>
+
 
 <body>
 
-<div id="root"></div>
 
-<script type="text/babel">
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-const { useState, useEffect, useRef } = React;
-const { motion, AnimatePresence } = Motion;
+<header class="header">
 
-function App(){
+    <a href="#home" class="logo">
+        Food<span>Hub</span>
+    </a>
 
-  // =========================
-  // STATES
-  // =========================
 
-  const [array,setArray] = useState([42,18,75,11,67,29,90,5]);
-  const [steps,setSteps] = useState([]);
+    <nav class="nav">
 
-  const [currentStep,setCurrentStep] = useState(0);
+        <a href="#home">
+            Trang chủ
+        </a>
 
-  const [playing,setPlaying] = useState(false);
+        <a href="#menu">
+            Thực đơn
+        </a>
 
-  const [speed,setSpeed] = useState(700);
+        <a href="#restaurant">
+            Nhà hàng
+        </a>
 
-  const [stats,setStats] = useState({
-    comparisons:0,
-    swaps:0,
-    sorted:0
-  });
+        <a href="#booking">
+            Đặt bàn
+        </a>
 
-  const audioCtxRef = useRef(null);
+        <a href="#cart">
+            🛒 Giỏ hàng
+        </a>
 
-  // =========================
-  // AUDIO
-  // =========================
+    </nav>
 
-  useEffect(()=>{
-    audioCtxRef.current =
-      new (window.AudioContext || window.webkitAudioContext)();
-  },[]);
+</header>
 
-  const playClick = (freq=180,duration=0.03,volume=0.03) => {
 
-    const ctx = audioCtxRef.current;
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+<!-- =====================================================
+     PAGE 1 - HOME
+===================================================== -->
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+<section class="page active" id="home">
 
-    osc.frequency.value = freq;
-    gain.gain.value = volume;
+    <div class="hero">
 
-    osc.start();
+        <div class="hero-content">
 
-    osc.stop(ctx.currentTime + duration);
-  };
+            <span class="badge">
+                🍽️ KHÁM PHÁ ẨM THỰC
+            </span>
 
-  // =========================
-  // TEXT TO SPEECH
-  // =========================
 
-  const speak = (text) => {
+            <h1>
 
-    speechSynthesis.cancel();
+                Khám phá<br>
 
-    const utterance =
-      new SpeechSynthesisUtterance(text);
+                <span>
+                    món ngon
+                </span>
 
-    utterance.lang = "vi-VN";
-    utterance.rate = 1;
+                mỗi ngày
 
-    speechSynthesis.speak(utterance);
-  };
+            </h1>
 
-  // =========================
-  // PSEUDO CODE
-  // =========================
 
-  const codeLines = [
-    "for(i = 0; i < n - 1; i++)",
-    "   min = i",
-    "   for(j = i + 1; j < n; j++)",
-    "      if(arr[j] < arr[min])",
-    "         min = j",
-    "   if(min != i)",
-    "      swap(arr[i], arr[min])",
-    "mark sorted"
-  ];
+            <p>
 
-  // =========================
-  // STEP GENERATOR
-  // =========================
+                FoodHub giúp bạn tìm kiếm món ăn,
+                khám phá nhà hàng và đặt bàn
+                một cách nhanh chóng.
 
-  const generateSelectionSort = () => {
-
-    const arr = [...array];
+            </p>
 
-    const generated = [];
-
-    let comparisons = 0;
-    let swaps = 0;
-
-    for(let i=0;i<arr.length-1;i++){
-
-      let min = i;
-
-      generated.push({
-        type:"select",
-        line:1,
-        i,
-        min,
-        array:[...arr],
-        message:`Chọn vị trí nhỏ nhất bắt đầu từ index ${i}`
-      });
-
-      for(let j=i+1;j<arr.length;j++){
-
-        comparisons++;
-
-        generated.push({
-          type:"compare",
-          line:3,
-          i,
-          j,
-          min,
-          array:[...arr],
-          comparisons,
-          swaps,
-          message:`So sánh arr[${j}] với arr[${min}]`
-        });
-
-        if(arr[j] < arr[min]){
-
-          min = j;
-
-          generated.push({
-            type:"newMin",
-            line:4,
-            i,
-            j,
-            min,
-            array:[...arr],
-            comparisons,
-            swaps,
-            message:`Tìm thấy giá trị nhỏ hơn mới`
-          });
-        }
-      }
-
-      if(min !== i){
-
-        [arr[i],arr[min]] =
-        [arr[min],arr[i]];
-
-        swaps++;
-
-        generated.push({
-          type:"swap",
-          line:6,
-          i,
-          min,
-          array:[...arr],
-          comparisons,
-          swaps,
-          message:`Hoán đổi phần tử tại ${i} và ${min}`
-        });
-      }
-
-      generated.push({
-        type:"sorted",
-        line:7,
-        i,
-        min,
-        array:[...arr],
-        comparisons,
-        swaps,
-        sorted:i+1,
-        message:`Phần tử tại index ${i} đã đúng vị trí`
-      });
-    }
-
-    generated.push({
-      type:"done",
-      line:7,
-      array:[...arr],
-      comparisons,
-      swaps,
-      sorted:arr.length,
-      message:"Thuật toán hoàn tất"
-    });
-
-    setSteps(generated);
-    setCurrentStep(0);
-  };
-
-  // =========================
-  // INITIAL
-  // =========================
-
-  useEffect(()=>{
-    generateSelectionSort();
-  },[]);
-
-  // =========================
-  // PLAY ENGINE
-  // =========================
 
-  useEffect(()=>{
+            <div class="buttons">
 
-    if(!playing) return;
-
-    if(currentStep >= steps.length-1){
-      setPlaying(false);
-      return;
-    }
-
-    const timeout = setTimeout(()=>{
-
-      const next = currentStep + 1;
-
-      const step = steps[next];
-
-      // sound
-      if(step.type === "swap"){
-        playClick(120,0.05,0.04);
-      }else{
-        playClick(220,0.02,0.02);
-      }
-
-      // speech
-      speak(step.message);
-
-      // statistics
-      setStats({
-        comparisons:step.comparisons || 0,
-        swaps:step.swaps || 0,
-        sorted:step.sorted || 0
-      });
-
-      setCurrentStep(next);
-
-    },speed);
-
-    return ()=>clearTimeout(timeout);
-
-  },[playing,currentStep,steps,speed]);
-
-  const step = steps[currentStep] || {};
-
-  // =========================
-  // COLORS
-  // =========================
-
-  const getBarColor = (index) => {
-
-    if(step.type === "done")
-      return "#22c55e";
-
-    if(index < (step.sorted || 0))
-      return "#22c55e";
-
-    if(index === step.i || index === step.j)
-      return "#0ea5e9";
-
-    if(index === step.min)
-      return "#f59e0b";
-
-    if(step.type === "swap" &&
-      (index === step.i || index === step.min))
-      return "#ef4444";
-
-    return "#334155";
-  };
-
-  // =========================
-  // UI
-  // =========================
-
-  return (
-
-    <div className="h-screen p-5 flex flex-col gap-5">
-
-      {/* HEADER */}
-
-      <div className="glass rounded-3xl p-5 flex justify-between items-center">
-
-        <div>
-          <h1 className="text-3xl font-black text-sky-400">
-            Educational Algorithm Visualizer
-          </h1>
-
-          <p className="text-slate-400 text-sm mt-1">
-            Selection Sort + Framer Motion + Code Tracing
-          </p>
-        </div>
-
-        <div className="text-sm text-slate-500 font-mono">
-          Educational UX Engineering
-        </div>
-      </div>
-
-      {/* MAIN */}
-
-      <div className="grid grid-cols-12 gap-5 flex-1 overflow-hidden">
-
-        {/* VISUALIZER */}
-
-        <div className="col-span-8 glass rounded-3xl p-6 flex flex-col">
-
-          {/* DASHBOARD */}
-
-          <div className="grid grid-cols-3 gap-4 mb-8">
-
-            <DashboardCard
-              title="Comparisons"
-              value={stats.comparisons}
-              color="text-sky-400"
-            />
-
-            <DashboardCard
-              title="Swaps"
-              value={stats.swaps}
-              color="text-rose-400"
-            />
-
-            <DashboardCard
-              title="Sorted"
-              value={stats.sorted}
-              color="text-emerald-400"
-            />
-          </div>
-
-          {/* BARS */}
-
-          <div className="flex-1 flex items-end justify-center gap-4">
-
-            <AnimatePresence>
-
-              {step.array?.map((value,index)=>(
-
-                <motion.div
-                  layout
-                  key={index + "-" + value}
-
-                  transition={{
-                    type:"spring",
-                    stiffness:220,
-                    damping:18
-                  }}
-
-                  animate={{
-                    height:value * 3,
-                    backgroundColor:getBarColor(index)
-                  }}
-
-                  className="
-                    w-16 rounded-t-2xl
-                    flex items-start justify-center
-                    pt-2 font-bold text-white
-                    shadow-lg
-                  "
+                <a
+                    href="#menu"
+                    class="btn primary"
                 >
-                  {value}
-                </motion.div>
+                    🍜 Xem thực đơn
+                </a>
 
-              ))}
 
-            </AnimatePresence>
+                <a
+                    href="#restaurant"
+                    class="btn secondary"
+                >
+                    🏪 Nhà hàng
+                </a>
 
-          </div>
-
-          {/* CONTROLS */}
-
-          <div className="mt-8 flex items-center gap-4">
-
-            <button
-              onClick={()=>setPlaying(!playing)}
-              className="
-                bg-sky-500 hover:bg-sky-400
-                px-5 py-3 rounded-xl
-                font-bold
-              "
-            >
-              {playing ? "Pause" : "Play"}
-            </button>
-
-            <button
-              onClick={()=>{
-                setPlaying(false);
-                setCurrentStep(prev =>
-                  Math.max(prev - 1,0)
-                );
-              }}
-              className="
-                bg-white/5
-                border border-white/10
-                px-4 py-3 rounded-xl
-              "
-            >
-              Prev
-            </button>
-
-            <button
-              onClick={()=>{
-                setPlaying(false);
-                setCurrentStep(prev =>
-                  Math.min(prev + 1,steps.length-1)
-                );
-              }}
-              className="
-                bg-white/5
-                border border-white/10
-                px-4 py-3 rounded-xl
-              "
-            >
-              Next
-            </button>
-
-            {/* SPEED */}
-
-            <div className="ml-auto flex items-center gap-3">
-
-              <span className="text-slate-400 text-sm">
-                🐢
-              </span>
-
-              <input
-                type="range"
-                min="100"
-                max="1500"
-                step="50"
-                value={speed}
-                onChange={(e)=>
-                  setSpeed(Number(e.target.value))
-                }
-                className="w-48 accent-sky-500"
-              />
-
-              <span className="text-slate-400 text-sm">
-                ⚡
-              </span>
             </div>
 
-          </div>
-
         </div>
 
-        {/* CODE TRACING */}
+    </div>
 
-        <div className="col-span-4 glass rounded-3xl p-6 flex flex-col">
 
-          <div className="mb-5">
+    <div class="container">
 
-            <h2 className="text-xl font-black text-emerald-400">
-              Code Tracing
+        <div class="section-title">
+
+            <small>
+                FOODHUB
+            </small>
+
+            <h2>
+                Bạn muốn khám phá gì?
             </h2>
 
-            <p className="text-slate-500 text-sm mt-1">
-              Highlight realtime theo bước thuật toán
-            </p>
-          </div>
+        </div>
 
-          {/* CODE */}
 
-          <div className="space-y-2 font-mono text-sm">
+        <div class="feature-grid">
 
-            {codeLines.map((line,index)=>{
 
-              const active =
-                step.line === index;
-
-              return (
-
-                <motion.div
-                  key={index}
-
-                  animate={{
-                    backgroundColor:
-                      active
-                        ? "rgba(14,165,233,0.15)"
-                        : "rgba(255,255,255,0)",
-
-                    borderColor:
-                      active
-                        ? "rgba(14,165,233,0.5)"
-                        : "rgba(255,255,255,0)"
-                  }}
-
-                  className="
-                    px-4 py-3 rounded-xl
-                    border
-                  "
-                >
-
-                  <div className="flex items-center gap-3">
-
-                    <div className={`
-                      text-xs
-                      ${active
-                        ? "text-sky-400"
-                        : "text-slate-600"}
-                    `}>
-                      {active ? "▶" : index + 1}
-                    </div>
-
-                    <div className={`
-                      ${active
-                        ? "text-sky-200"
-                        : "text-slate-400"}
-                    `}>
-                      {line}
-                    </div>
-
-                  </div>
-
-                </motion.div>
-
-              );
-            })}
-
-          </div>
-
-          {/* EXPLANATION */}
-
-          <div className="
-            mt-auto
-            pt-5
-            border-t border-white/5
-          ">
-
-            <div className="text-slate-500 text-xs uppercase mb-2">
-              Current Explanation
-            </div>
-
-            <motion.div
-              key={step.message}
-              initial={{opacity:0,y:10}}
-              animate={{opacity:1,y:0}}
-
-              className="
-                text-slate-300
-                leading-relaxed
-              "
+            <a
+                href="#menu"
+                class="feature-card"
             >
-              {step.message}
-            </motion.div>
 
-          </div>
+                <div class="feature-icon">
+                    🍜
+                </div>
+
+                <h3>
+                    Thực đơn
+                </h3>
+
+                <p>
+                    Khám phá những món ăn hấp dẫn.
+                </p>
+
+            </a>
+
+
+
+            <a
+                href="#restaurant"
+                class="feature-card"
+            >
+
+                <div class="feature-icon">
+                    🏪
+                </div>
+
+                <h3>
+                    Nhà hàng
+                </h3>
+
+                <p>
+                    Tìm kiếm những nhà hàng nổi bật.
+                </p>
+
+            </a>
+
+
+
+            <a
+                href="#booking"
+                class="feature-card"
+            >
+
+                <div class="feature-icon">
+                    📅
+                </div>
+
+                <h3>
+                    Đặt bàn
+                </h3>
+
+                <p>
+                    Đặt bàn nhanh chóng và tiện lợi.
+                </p>
+
+            </a>
+
 
         </div>
 
-      </div>
+    </div>
+
+
+    <footer>
+
+        <strong>
+            FoodHub
+        </strong>
+
+        <p>
+            Khám phá ẩm thực Việt Nam
+        </p>
+
+    </footer>
+
+</section>
+
+
+
+<!-- =====================================================
+     PAGE 2 - MENU
+===================================================== -->
+
+<section class="page" id="menu">
+
+    <div class="container">
+
+
+        <a
+            href="#home"
+            class="back"
+        >
+            ← Trang chủ
+        </a>
+
+
+        <div class="section-title">
+
+            <small>
+                FOOD MENU
+            </small>
+
+            <h1>
+                Thực đơn
+            </h1>
+
+            <p>
+                Những món ăn được yêu thích
+                tại FoodHub.
+            </p>
+
+        </div>
+
+
+
+        <div class="category">
+
+            <button
+                class="active"
+                onclick="filterFood('all', this)"
+            >
+                Tất cả
+            </button>
+
+            <button
+                onclick="filterFood('noodle', this)"
+            >
+                🍜 Món nước
+            </button>
+
+            <button
+                onclick="filterFood('rice', this)"
+            >
+                🍚 Cơm
+            </button>
+
+            <button
+                onclick="filterFood('drink', this)"
+            >
+                🥤 Đồ uống
+            </button>
+
+        </div>
+
+
+
+        <div class="food-grid">
+
+
+            <!-- FOOD 1 -->
+
+            <div
+                class="food-card"
+                data-category="noodle"
+            >
+
+                <img
+                    src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=900&q=80"
+                    alt="Phở bò"
+                >
+
+
+                <div class="food-info">
+
+                    <h3>
+                        Phở Bò Đặc Biệt
+                    </h3>
+
+                    <p>
+                        Nước dùng bò ninh nhiều giờ,
+                        thịt bò tươi và bánh phở mềm.
+                    </p>
+
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            65.000đ
+                        </strong>
+
+
+                        <a
+                            href="#detail"
+                            class="small-btn"
+                        >
+                            Xem món
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FOOD 2 -->
+
+            <div
+                class="food-card"
+                data-category="noodle"
+            >
+
+                <img
+                    src="https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?auto=format&fit=crop&w=900&q=80"
+                    alt="Bún bò"
+                >
+
+
+                <div class="food-info">
+
+                    <h3>
+                        Bún Bò Huế
+                    </h3>
+
+                    <p>
+                        Hương vị đậm đà đặc trưng
+                        của miền Trung.
+                    </p>
+
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            55.000đ
+                        </strong>
+
+
+                        <a
+                            href="#detail"
+                            class="small-btn"
+                        >
+                            Xem món
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FOOD 3 -->
+
+            <div
+                class="food-card"
+                data-category="rice"
+            >
+
+                <img
+                    src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80"
+                    alt="Cơm"
+                >
+
+
+                <div class="food-info">
+
+                    <h3>
+                        Cơm Tấm Sườn
+                    </h3>
+
+                    <p>
+                        Sườn nướng thơm ngon
+                        cùng cơm tấm.
+                    </p>
+
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            59.000đ
+                        </strong>
+
+
+                        <a
+                            href="#detail"
+                            class="small-btn"
+                        >
+                            Xem món
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FOOD 4 -->
+
+            <div
+                class="food-card"
+                data-category="rice"
+            >
+
+                <img
+                    src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+                    alt="Cơm gà"
+                >
+
+
+                <div class="food-info">
+
+                    <h3>
+                        Cơm Gà Hội An
+                    </h3>
+
+                    <p>
+                        Cơm gà truyền thống
+                        với rau thơm.
+                    </p>
+
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            60.000đ
+                        </strong>
+
+
+                        <a
+                            href="#detail"
+                            class="small-btn"
+                        >
+                            Xem món
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FOOD 5 -->
+
+            <div
+                class="food-card"
+                data-category="drink"
+            >
+
+                <img
+                    src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=900&q=80"
+                    alt="Trà đào"
+                >
+
+
+                <div class="food-info">
+
+                    <h3>
+                        Trà Đào Cam Sả
+                    </h3>
+
+                    <p>
+                        Thức uống thanh mát
+                        cho ngày hè.
+                    </p>
+
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            35.000đ
+                        </strong>
+
+
+                        <a
+                            href="#detail"
+                            class="small-btn"
+                        >
+                            Xem món
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FOOD 6 -->
+
+            <div
+                class="food-card"
+                data-category="drink"
+            >
+
+                <img
+                    src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=900&q=80"
+                    alt="Cà phê"
+                >
+
+
+                <div class="food-info">
+
+                    <h3>
+                        Cà Phê Sữa Đá
+                    </h3>
+
+                    <p>
+                        Cà phê Việt Nam
+                        đậm đà.
+                    </p>
+
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            30.000đ
+                        </strong>
+
+
+                        <a
+                            href="#detail"
+                            class="small-btn"
+                        >
+                            Xem món
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
 
     </div>
-  );
-}
 
-function DashboardCard({title,value,color}){
 
-  return (
+    <footer>
 
-    <div className="
-      glass rounded-2xl p-5
-    ">
+        <strong>
+            FoodHub
+        </strong>
 
-      <div className="
-        text-slate-500 text-xs uppercase
-        tracking-wider
-      ">
-        {title}
-      </div>
+        <p>
+            <a href="#home">
+                ← Quay về trang chủ
+            </a>
+        </p>
 
-      <motion.div
-        key={value}
+    </footer>
 
-        initial={{
-          scale:1.3,
-          opacity:0.5
-        }}
+</section>
 
-        animate={{
-          scale:1,
-          opacity:1
-        }}
 
-        transition={{
-          type:"spring"
-        }}
 
-        className={`
-          text-4xl font-black mt-2
-          ${color}
-        `}
-      >
-        {value}
-      </motion.div>
+<!-- =====================================================
+     PAGE 3 - DETAIL
+===================================================== -->
+
+<section class="page" id="detail">
+
+    <div class="container">
+
+
+        <a
+            href="#menu"
+            class="back"
+        >
+            ← Quay lại thực đơn
+        </a>
+
+
+        <div class="detail-layout">
+
+
+            <div>
+
+                <img
+                    class="detail-image"
+                    src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1200&q=85"
+                    alt="Phở bò"
+                >
+
+            </div>
+
+
+
+            <div class="detail-info">
+
+                <span class="badge">
+                    ⭐ 4.9 / 5
+                </span>
+
+
+                <h1>
+                    Phở Bò Đặc Biệt
+                </h1>
+
+
+                <p class="detail-description">
+
+                    Phở bò là một trong những món ăn
+                    đặc trưng của ẩm thực Việt Nam.
+
+                    <br><br>
+
+                    Nước dùng được ninh từ xương bò
+                    trong nhiều giờ kết hợp với bánh phở,
+                    thịt bò và các loại rau thơm.
+
+                </p>
+
+
+                <h2 class="detail-price">
+                    65.000đ
+                </h2>
+
+
+                <div class="buttons">
+
+                    <a
+                        href="#cart"
+                        class="btn primary"
+                        onclick="addCart()"
+                    >
+                        🛒 Thêm vào giỏ
+                    </a>
+
+
+                    <a
+                        href="#booking"
+                        class="btn secondary"
+                    >
+                        📅 Đặt bàn
+                    </a>
+
+                </div>
+
+
+                <div class="back-links">
+
+                    <a href="#menu">
+                        ← Thực đơn
+                    </a>
+
+                    <a href="#home">
+                        🏠 Trang chủ
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
-  );
+
+
+    <footer>
+
+        <strong>
+            FoodHub
+        </strong>
+
+    </footer>
+
+</section>
+
+
+
+<!-- =====================================================
+     PAGE 4 - RESTAURANT
+===================================================== -->
+
+<section class="page" id="restaurant">
+
+    <div class="container">
+
+
+        <a
+            href="#home"
+            class="back"
+        >
+            ← Trang chủ
+        </a>
+
+
+        <div class="section-title">
+
+            <small>
+                RESTAURANTS
+            </small>
+
+            <h1>
+                Nhà hàng nổi bật
+            </h1>
+
+            <p>
+                Khám phá những địa điểm
+                ẩm thực được yêu thích.
+            </p>
+
+        </div>
+
+
+
+        <div class="restaurant-grid">
+
+
+            <div class="restaurant-card">
+
+                <img
+                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80"
+                    alt="Nhà hàng"
+                >
+
+
+                <div class="restaurant-info">
+
+                    <h2>
+                        The Garden Restaurant
+                    </h2>
+
+                    <p>
+                        🇻🇳 Ẩm thực Việt Nam
+                    </p>
+
+                    <p>
+                        ⭐ 4.9 · 1200 đánh giá
+                    </p>
+
+
+                    <a
+                        href="#booking"
+                        class="btn primary"
+                    >
+                        Đặt bàn
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="restaurant-card">
+
+                <img
+                    src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=80"
+                    alt="Nhà hàng"
+                >
+
+
+                <div class="restaurant-info">
+
+                    <h2>
+                        Riverside Kitchen
+                    </h2>
+
+                    <p>
+                        🍜 Asian Fusion
+                    </p>
+
+                    <p>
+                        ⭐ 4.8 · 950 đánh giá
+                    </p>
+
+
+                    <a
+                        href="#booking"
+                        class="btn primary"
+                    >
+                        Đặt bàn
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="restaurant-card">
+
+                <img
+                    src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=80"
+                    alt="Nhà hàng"
+                >
+
+
+                <div class="restaurant-info">
+
+                    <h2>
+                        Hanoi Food House
+                    </h2>
+
+                    <p>
+                        🥢 Vietnamese Food
+                    </p>
+
+                    <p>
+                        ⭐ 4.7 · 870 đánh giá
+                    </p>
+
+
+                    <a
+                        href="#booking"
+                        class="btn primary"
+                    >
+                        Đặt bàn
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="restaurant-card">
+
+                <img
+                    src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80"
+                    alt="Nhà hàng"
+                >
+
+
+                <div class="restaurant-info">
+
+                    <h2>
+                        Sunset Dining
+                    </h2>
+
+                    <p>
+                        🍽️ Fine Dining
+                    </p>
+
+                    <p>
+                        ⭐ 4.8 · 760 đánh giá
+                    </p>
+
+
+                    <a
+                        href="#booking"
+                        class="btn primary"
+                    >
+                        Đặt bàn
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <footer>
+
+        <strong>
+            FoodHub
+        </strong>
+
+        <p>
+
+            <a href="#home">
+                ← Trang chủ
+            </a>
+
+        </p>
+
+    </footer>
+
+</section>
+
+
+
+<!-- =====================================================
+     PAGE 5 - BOOKING
+===================================================== -->
+
+<section class="page" id="booking">
+
+    <div class="container">
+
+
+        <a
+            href="#home"
+            class="back"
+        >
+            ← Trang chủ
+        </a>
+
+
+        <div class="section-title">
+
+            <small>
+                RESERVATION
+            </small>
+
+            <h1>
+                Đặt bàn
+            </h1>
+
+            <p>
+                Đặt bàn nhanh chóng tại
+                nhà hàng bạn yêu thích.
+            </p>
+
+        </div>
+
+
+
+        <div class="booking-box">
+
+
+            <form
+                onsubmit="bookingSuccess(event)"
+            >
+
+
+                <label>
+                    Họ và tên
+                </label>
+
+                <input
+                    type="text"
+                    placeholder="Nguyễn Văn A"
+                    required
+                >
+
+
+
+                <label>
+                    Số điện thoại
+                </label>
+
+                <input
+                    type="tel"
+                    placeholder="09xxxxxxxx"
+                    required
+                >
+
+
+
+                <label>
+                    Ngày
+                </label>
+
+                <input
+                    type="date"
+                    required
+                >
+
+
+
+                <label>
+                    Thời gian
+                </label>
+
+                <input
+                    type="time"
+                    required
+                >
+
+
+
+                <label>
+                    Số lượng khách
+                </label>
+
+                <select>
+
+                    <option>
+                        1 người
+                    </option>
+
+                    <option>
+                        2 người
+                    </option>
+
+                    <option>
+                        3 người
+                    </option>
+
+                    <option>
+                        4 người
+                    </option>
+
+                    <option>
+                        5 người
+                    </option>
+
+                    <option>
+                        6 người
+                    </option>
+
+                    <option>
+                        7 người
+                    </option>
+
+                    <option>
+                        8 người
+                    </option>
+
+                </select>
+
+
+
+                <label>
+                    Ghi chú
+                </label>
+
+                <textarea
+                    placeholder="Yêu cầu đặc biệt..."
+                ></textarea>
+
+
+
+                <button
+                    class="btn primary"
+                    type="submit"
+                >
+                    📅 Xác nhận đặt bàn
+                </button>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <footer>
+
+        <strong>
+            FoodHub
+        </strong>
+
+        <p>
+
+            <a href="#home">
+                ← Về trang chủ
+            </a>
+
+        </p>
+
+    </footer>
+
+</section>
+
+
+
+<!-- =====================================================
+     PAGE 6 - CART
+===================================================== -->
+
+<section class="page" id="cart">
+
+    <div class="container">
+
+
+        <a
+            href="#menu"
+            class="back"
+        >
+            ← Tiếp tục mua món
+        </a>
+
+
+        <div class="section-title">
+
+            <small>
+                YOUR CART
+            </small>
+
+            <h1>
+                Giỏ hàng
+            </h1>
+
+            <p>
+                Các món ăn bạn đã lựa chọn.
+            </p>
+
+        </div>
+
+
+
+        <div class="cart-box">
+
+
+            <div class="cart-item">
+
+
+                <img
+                    src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=400&q=80"
+                    alt="Phở"
+                >
+
+
+                <div>
+
+                    <h3>
+                        Phở Bò Đặc Biệt
+                    </h3>
+
+                    <p>
+                        1 × 65.000đ
+                    </p>
+
+                </div>
+
+
+                <strong>
+                    65.000đ
+                </strong>
+
+
+            </div>
+
+
+
+            <div class="cart-total">
+
+                <span>
+                    Tổng cộng
+                </span>
+
+                <strong>
+                    65.000đ
+                </strong>
+
+            </div>
+
+
+
+            <div class="buttons">
+
+                <a
+                    href="#booking"
+                    class="btn primary"
+                >
+                    📅 Đặt bàn
+                </a>
+
+
+                <a
+                    href="#menu"
+                    class="btn secondary"
+                >
+                    ← Thêm món
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <footer>
+
+        <strong>
+            FoodHub
+        </strong>
+
+        <p>
+
+            <a href="#home">
+                🏠 Trang chủ
+            </a>
+
+        </p>
+
+    </footer>
+
+</section>
+
+
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+    class="toast"
+    id="toast"
+>
+</div>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+/* =====================================================
+   CHUYỂN TRANG BẰNG HASH
+===================================================== */
+
+function showPage() {
+
+    let hash =
+        window.location.hash.substring(1);
+
+    if (!hash) {
+        hash = "home";
+    }
+
+
+    const pages =
+        document.querySelectorAll(".page");
+
+
+    pages.forEach(page => {
+
+        page.classList.remove("active");
+
+    });
+
+
+    const target =
+        document.getElementById(hash);
+
+
+    if (target) {
+
+        target.classList.add("active");
+
+    }
+
+    else {
+
+        document
+            .getElementById("home")
+            .classList.add("active");
+
+        window.location.hash =
+            "home";
+
+    }
+
+
+    updateNavigation(hash);
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "instant"
+    });
+
 }
 
-const root =
-  ReactDOM.createRoot(
-    document.getElementById("root")
-  );
 
-root.render(<App />);
+/* =====================================================
+   CẬP NHẬT MENU
+===================================================== */
+
+function updateNavigation(page) {
+
+    const links =
+        document.querySelectorAll(".nav a");
+
+
+    links.forEach(link => {
+
+        link.classList.remove("active");
+
+        const href =
+            link.getAttribute("href");
+
+
+        if (
+            href === "#" + page
+        ) {
+
+            link.classList.add("active");
+
+        }
+
+    });
+
+}
+
+
+/* =====================================================
+   THEO DÕI URL
+===================================================== */
+
+window.addEventListener(
+    "hashchange",
+    showPage
+);
+
+window.addEventListener(
+    "DOMContentLoaded",
+    showPage
+);
+
+
+/* =====================================================
+   LỌC MÓN ĂN
+===================================================== */
+
+function filterFood(category, button) {
+
+    const foods =
+        document.querySelectorAll(
+            ".food-card"
+        );
+
+
+    const buttons =
+        document.querySelectorAll(
+            ".category button"
+        );
+
+
+    buttons.forEach(btn => {
+
+        btn.classList.remove(
+            "active"
+        );
+
+    });
+
+
+    button.classList.add(
+        "active"
+    );
+
+
+    foods.forEach(food => {
+
+        const foodCategory =
+            food.dataset.category;
+
+
+        if (
+            category === "all" ||
+            foodCategory === category
+        ) {
+
+            food.style.display =
+                "block";
+
+        }
+
+        else {
+
+            food.style.display =
+                "none";
+
+        }
+
+    });
+
+}
+
+
+/* =====================================================
+   THÊM VÀO GIỎ
+===================================================== */
+
+function addCart() {
+
+    localStorage.setItem(
+        "foodhub_cart",
+        "Pho Bo"
+    );
+
+
+    showToast(
+        "🛒 Đã thêm Phở Bò vào giỏ hàng!"
+    );
+
+}
+
+
+/* =====================================================
+   ĐẶT BÀN
+===================================================== */
+
+function bookingSuccess(event) {
+
+    event.preventDefault();
+
+
+    showToast(
+        "🎉 Đặt bàn thành công!"
+    );
+
+
+    event.target.reset();
+
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    setTimeout(() => {
+
+        toast.classList.remove(
+            "show"
+        );
+
+    }, 3000);
+
+}
 
 </script>
 
